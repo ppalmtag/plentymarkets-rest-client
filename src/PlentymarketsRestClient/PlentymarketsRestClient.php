@@ -132,6 +132,17 @@ class PlentymarketsRestClient
                 throw $e;
             }
 
+            // new error handling for specific errors I encountered
+            // TODO: there are surely more errors that require a specific response
+            if ($e instanceof \GuzzleHttp\Exception\RequestException) {
+                if ($e->hasResponse()) {
+                    $response_body = $e->getResponse()->getBody();
+                    if (!empty($response_body) && is_array(json_decode($response_body, true)) && json_last_error() == 0) {
+                        return json_decode($response_body, true);
+                    }
+                }
+            }
+
             return null;
         }
 
